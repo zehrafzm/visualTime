@@ -4,7 +4,7 @@ import {Picker} from '@react-native-picker/picker';
 
 
 const MonthPicker = ({ onSelect }) => {
-    const [selectedNumber, setSelectedNumber] = useState("0");
+    const [selectedNumber, setSelectedNumber] = useState("1");
     const pickerRef = useRef();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 

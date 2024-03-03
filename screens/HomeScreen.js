@@ -55,7 +55,16 @@ const HomeScreen = ({ navigation }) => {
     return unsubscribe;
   }, [navigation]); // Run every time the navigation focus changes
 
-  
+  const deleteData = async (myKey,navigation) => {
+    try {
+        await AsyncStorage.removeItem(myKey);
+        // Item removed successfully
+    } catch (e) {
+        console.error(e);
+        // Error removing item
+    };
+    navigation.navigate("HomeScreen")
+};
   return (
     <ScrollView
       ref={scrollViewRef}
@@ -75,17 +84,31 @@ const HomeScreen = ({ navigation }) => {
       {toggleE&&(
         <View>
         {data ? (
-                <View>
-                    {data.map(item => (
-                        <Pressable style={styles.button }  onPress={()=> navigation.navigate("Visual",{ paramName: item.key })}  >                            
-                                <Text style={styles.buttonText} >{item.key}</Text>
-                        </Pressable>
-                    
-                    ))}
-                </View>
-                ) : (
-                <Text>No data found</Text>
-                )}
+    <View>
+      {data.map(item => (
+        item.value.type === "SE" ? (
+          <View key={item.key}>
+            <Pressable style={styles.button} onPress={() => navigation.navigate("VisualSE", { paramName: item.key })}>
+            
+              <Text style={styles.buttonText}>{item.key}</Text>
+              <Text style={styles.buttonText}>{item.value.type}</Text>
+
+            </Pressable>
+          </View>
+        ) : item.value.type === "MIN" ? (
+          <View key={item.key}>
+            <Pressable style={styles.button} onPress={() => navigation.navigate("Visual", { paramName: item.key })}>
+              <Text style={styles.buttonText}>{item.key}</Text>
+              <Text style={styles.buttonText}>{item.value.type}</Text>
+            </Pressable>
+          </View>
+        ) : null
+      ))}
+  </View>
+) : (
+  <Text>No data found</Text>
+)}
+
         </View>
       )}
       </Pressable>      
@@ -145,5 +168,4 @@ const styles = StyleSheet.create({
 
 
 export default HomeScreen;
-
 

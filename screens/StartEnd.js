@@ -8,10 +8,14 @@ import MonthPicker from "./assets/MonthPicker";
 import DayPicker from "./assets/DayPicker";
 import YearPicker from "./assets/YearPicker";
 
+
 export default function StartEnd (){
-    const[hours,setHours]=useState("0");
-    const[minutes,setMinutes]=useState("0");
+    const[day,setDay]=useState("1");
+    const[month,setMonth]=useState("1");
+    const[year,setYear]=useState("2024");
     const[timeName,setTimeName]=useState("");
+    const [descrip, setDescrip] = useState("");
+
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const [data, setData] = useState(null);
     const navigation = useNavigation();
@@ -20,12 +24,12 @@ export default function StartEnd (){
       setScrollPositionY(event.nativeEvent.contentOffset.y);
     };
 
-    const storeData = async (myKey,value) => {
+    const storeData = async (myKey,value,type,descrip) => {
         try {
             const currentDate = new Date();
-            const data = { date: currentDate, value: value };  
-          const jsonValue = JSON.stringify(data);
-          await AsyncStorage.setItem(myKey, jsonValue);
+            const data = { date: currentDate, value: value,type:type, descrip:descrip };  
+            const jsonValue = JSON.stringify(data);
+            await AsyncStorage.setItem(myKey, jsonValue);
         } catch (e) {
           // saving error
         }
@@ -33,10 +37,10 @@ export default function StartEnd (){
      
     
      
-    const setTimeObject= (hours,minutes,timeName,navigation)=>{
-        const totalMinutes= parseInt(hours)*60 + parseInt(minutes);
+    const setTimeObject= (day,month,year,timeName,descrip,navigation)=>{
+        const storedDate = new Date(year, month - 1, day);
         const myKey = intoKey(timeName);
-        storeData(myKey, totalMinutes);
+        storeData(myKey, storedDate,"SE",descrip);
         navigation.navigate("HomeScreen")
     } 
     
@@ -88,11 +92,14 @@ export default function StartEnd (){
         fetchData();
       }, []);
 
-      const handleSelectH = (value) => {
-        setHours(value);
+      const handleSelectD = (value) => {
+        setDay(value);
       };
       const handleSelectM = (value) => {
-        setMinutes(value);
+        setMonth(value);
+      };
+      const handleSelectY = (value) => {
+        setYear(value);
       };
 
     return(
@@ -105,7 +112,7 @@ export default function StartEnd (){
       onScroll={handleScrollY}
     >
         <View style={{backgroundColor:"#f2e7c9",height:windowHeight, alignItems: "center"}}>
-            <View style={{backgroundColor:"white",marginTop:windowHeight*0.3, alignItems: "center",borderRadius:50
+            <View style={{backgroundColor:"white",marginTop:windowHeight*0.23, alignItems: "center",borderRadius:50
             }} >
             <TextInput 
                 placeholder="name of the time visualization"
@@ -114,18 +121,38 @@ export default function StartEnd (){
                 style={[styles.input,{fontSize:windowWidth*0.03,width:windowWidth*0.7,height:windowHeight*0.1,
                 fontSize:windowHeight*0.02}]}
             />
+            <TextInput 
+                placeholder="description, motivation words etc."
+                value={descrip}
+                onChangeText={(text)=>setDescrip(text)}
+                style={[styles.input,{fontSize:windowWidth*0.03,width:windowWidth*0.7,height:windowHeight*0.1,
+                fontSize:windowHeight*0.02}]}
+            />
             
-            <DayPicker onSelect={handleSelectM} />
+            <DayPicker onSelect={handleSelectD} />
 
-            <MonthPicker   onSelect={handleSelectH} />
+            <MonthPicker   onSelect={handleSelectM} />
             
-            <YearPicker onSelect={handleSelectM} />
+            <YearPicker onSelect={handleSelectY} />
 
 
-            <Pressable onPress={()=>setTimeObject(hours,minutes,timeName,navigation)}  >
+            <Pressable onPress={()=>setTimeObject(day,month,year,timeName,descrip,navigation)}  >
                 <Text style={{fontSize:windowHeight*0.05}} > Create </Text>
             </Pressable>
             </View>
+            {data ? (
+                <View>
+                    {data.map(item => (
+                    <View key={item.key}>
+                        <Text>{item.key}</Text>
+                        <Text>{JSON.stringify(item.value)}</Text>
+                        <Text>{JSON.stringify(item.date)}</Text>
+                    </View>
+                    ))}
+                </View>
+                ) : (
+                <Text>No data found</Text>
+                )}
            
             
         </View>

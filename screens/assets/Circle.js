@@ -1,15 +1,18 @@
 import React from 'react';
 import { View } from 'react-native';
 
-const Circle = ({ color }) => {
+const Circle = ({ color,size }) => {
   return (
     <View
       style={{
-        width: 50,
-        height: 50,
+        width: size,
+        height: size,
         borderRadius: 25,
         backgroundColor: color,
-        margin: 5,
+        //margin: 5,
+        marginRight:5,
+        marginLeft:5,
+        marginBottom:28
       }}
     />
   );

@@ -19,11 +19,11 @@ export default function CreateTimer (){
       setScrollPositionY(event.nativeEvent.contentOffset.y);
     };
 
-    const storeData = async (myKey,value) => {
+    const storeData = async (myKey,value,type) => {
         try {
             const currentDate = new Date();
-            const data = { date: currentDate, value: value };  
-          const jsonValue = JSON.stringify(data);
+            const data = { date: currentDate, value: value, type: type };  
+            const jsonValue = JSON.stringify(data);
           await AsyncStorage.setItem(myKey, jsonValue);
         } catch (e) {
           // saving error
@@ -35,7 +35,7 @@ export default function CreateTimer (){
     const setTimeObject= (hours,minutes,timeName,navigation)=>{
         const totalMinutes= parseInt(hours)*60 + parseInt(minutes);
         const myKey = intoKey(timeName);
-        storeData(myKey, totalMinutes);
+        storeData(myKey, totalMinutes,"MIN");
         navigation.navigate("HomeScreen")
     } 
     
