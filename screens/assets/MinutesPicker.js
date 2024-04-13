@@ -23,11 +23,11 @@ const MinutesPicker = ({ onSelect }) => {
   
     return (
       <View>
-        <Pressable style={{backgroundColor:"#b8e3ff",width:windowWidth*.8}}  onPress={openPicker} >
+        <Pressable style={{backgroundColor:"#b6d8f0",width:windowWidth*.8}}  onPress={openPicker} >
         <Text  style={{color:"black",fontSize:windowWidth*0.07,fontWeight: 'bold',}} > Select Minutes</Text></Pressable>
         <Picker
           ref={pickerRef}
-          style={{backgroundColor:"#b8e3ff"}}
+          style={{backgroundColor:"#b6d8f0"}}
           selectedValue={selectedNumber}
           onValueChange={(itemValue, itemIndex) =>
             setSelectedNumber(itemValue)

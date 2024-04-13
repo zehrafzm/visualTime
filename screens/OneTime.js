@@ -4,22 +4,12 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute,useNavigation   } from '@react-navigation/native';
 import SelectComponent from "./assets/NumberPicker";
-import MonthPicker from "./assets/MonthPicker";
-import DayPicker from "./assets/DayPicker";
-import YearPicker from "./assets/YearPicker";
-import { AdEventType, BannerAd, BannerAdSize, RewardedAdEventType, RewardedInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
+import MinutesPicker from "./assets/MinutesPicker";
+import HoursPicker from "./assets/HoursPicker";
 
-
-const rewardedInterstitial = RewardedInterstitialAd.createForAdRequest(TestIds.REWARDED_INTERSTITIAL,{
-  requestNonPersonalizedAdsOnly: true
-});
-
-
-export default function StartEnd ({navigation}){
-  
-    const[day,setDay]=useState("1");
-    const[month,setMonth]=useState("1");
-    const[year,setYear]=useState("2024");
+export default function OneTime ({navigation}){
+    const[hours,setHours]=useState("0");
+    const[minutes,setMinutes]=useState("0");
     const[timeName,setTimeName]=useState("");
     const [descrip, setDescrip] = useState("");
 
@@ -31,12 +21,12 @@ export default function StartEnd ({navigation}){
       setScrollPositionY(event.nativeEvent.contentOffset.y);
     };
 
-    const storeData = async (myKey,value,type,descrip) => {
+    const storeData = async (myKey,value,type) => {
         try {
             const currentDate = new Date();
-            const data = { date: currentDate, value: value,type:type, descrip:descrip };  
-            const jsonValue = JSON.stringify(data);
-            await AsyncStorage.setItem(myKey, jsonValue);
+            const data = { date: currentDate, value: value,type:type };  
+          const jsonValue = JSON.stringify(data);
+          await AsyncStorage.setItem(myKey, jsonValue);
         } catch (e) {
           // saving error
         }
@@ -44,8 +34,12 @@ export default function StartEnd ({navigation}){
      
     
      
-      
-    
+    const setTimeObject= (hours,minutes,navigation)=>{
+        const totalMinutes= parseInt(hours)*60 + parseInt(minutes);
+        storeData("ONETIME", totalMinutes,"ONE");
+        navigation.navigate("HomeScreen")
+        //navigation.navigate("VisualOne", { paramName: intoKey("ONETIME") })
+    } 
     
     
     const intoKey = (name) => {
@@ -72,53 +66,8 @@ export default function StartEnd ({navigation}){
         }
         return result.join("").toUpperCase();
     }
-    const [rewardedInterstitialLodaded,setRewardedInterstitialLoaded]= useState(false);
-  const loadRewardedInterstitial = ()=>{
-      const unsubscribeLoaded = rewardedInterstitial.addAdEventListener(
-        RewardedAdEventType.LOADED,
-        () =>{
-          setRewardedInterstitialLoaded(true);
-        }
-      );
-      const unsubscribeEarned = rewardedInterstitial.addAdEventListener(
-        RewardedAdEventType.EARNED_REWARD,
-        () =>{
-          setRewardedInterstitialLoaded(false);
-        }
-      );
-
-      const unsubscribeClosed = rewardedInterstitial.addAdEventListener(
-        AdEventType.CLOSED,
-        ()=>{
-          setRewardedInterstitialLoaded(false);
-          rewardedInterstitial.load();
-        }
-      );
-      rewardedInterstitial.load();
-      return ()=> {
-        unsubscribeLoaded();
-        unsubscribeClosed();
-        unsubscribeEarned();
-
-      }
-
-  };
-  useEffect(()=>{
-    const unsubscribeRewardedInterstitialEvents = loadRewardedInterstitial();
-    return unsubscribeRewardedInterstitialEvents;
-  },[])
-
-    const setTimeObject = (day, month, year, timeName, descrip, navigation) => {
-    const storedDate = new Date(year, parseInt(month) - 1, day);
-    const myKey = intoKey(timeName);
-    storeData(myKey, storedDate, "SE", descrip);
-    navigation.navigate("VisualSE",{ paramName: intoKey(timeName) });
-    if (rewardedInterstitialLodaded) {
-      rewardedInterstitial.show();
-    } else {
-      navigation.navigate(go2);
-    }
-};
+    
+ 
 
     const getData = async () => {
         try {
@@ -140,14 +89,11 @@ export default function StartEnd ({navigation}){
         fetchData();
       }, []);
 
-      const handleSelectD = (value) => {
-        setDay(value);
+      const handleSelectH = (value) => {
+        setHours(value);
       };
       const handleSelectM = (value) => {
-        setMonth(value);
-      };
-      const handleSelectY = (value) => {
-        setYear(value);
+        setMinutes(value);
       };
 
     return(
@@ -160,35 +106,17 @@ export default function StartEnd ({navigation}){
       onScroll={handleScrollY}
     >
         <View style={{backgroundColor:"#181b52",height:windowHeight, alignItems: "center"}}>
-            <View style={{backgroundColor:"#8dc8f2",marginTop:windowHeight*0.15, alignItems: "center",borderRadius:50
+            <View style={{backgroundColor:"#8dc8f2",marginTop:windowHeight*0.3, alignItems: "center",borderRadius:50
             }} >
-            <TextInput 
-                placeholder="name of the time visualization"
-                value={timeName}
-                onChangeText={(text)=>setTimeName(text)}
-                style={[styles.input,{fontSize:windowWidth*0.04,width:windowWidth*0.7,height:windowHeight*0.1,
-                }]}
-            />
-            <TextInput 
-                placeholder="description, motivation words etc."
-                value={descrip}
-                onChangeText={(text)=>setDescrip(text)}
-                style={[styles.input,{fontSize:windowWidth*0.04,width:windowWidth*0.7,height:windowHeight*0.1,
-                }]}
-            />
+            <HoursPicker   onSelect={handleSelectH} />
             
-            <DayPicker onSelect={handleSelectD} />
-
-            <MonthPicker   onSelect={handleSelectM} />
-            
-            <YearPicker onSelect={handleSelectY} />
+            <MinutesPicker onSelect={handleSelectM} />
 
 
-            <Pressable onPress={()=>setTimeObject(day,month,year,timeName,descrip,navigation)}  >
+            <Pressable onPress={()=>setTimeObject(hours,minutes,navigation)}  >
                 <Text style={{fontSize:windowHeight*0.05}} > Create </Text>
             </Pressable>
             </View>
-           
            
             
         </View>
@@ -218,7 +146,7 @@ const styles = StyleSheet.create({
     },
     button: {
       marginTop: 5,
-      backgroundColor: 'green',
+      backgroundColor: '#bd8700',
       padding: 5,
       borderRadius: 5,
     },
@@ -239,7 +167,7 @@ const styles = StyleSheet.create({
 
   /*
 
-    {data ? (
+   {data ? (
                 <View>
                     {data.map(item => (
                     <View key={item.key}>

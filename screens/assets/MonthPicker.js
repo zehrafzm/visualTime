@@ -4,7 +4,7 @@ import {Picker} from '@react-native-picker/picker';
 
 
 const MonthPicker = ({ onSelect }) => {
-    const [selectedNumber, setSelectedNumber] = useState("0");
+    const [selectedNumber, setSelectedNumber] = useState("1");
     const pickerRef = useRef();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 
@@ -23,11 +23,11 @@ const MonthPicker = ({ onSelect }) => {
   
     return (
       <View>
-        <Pressable style={{backgroundColor:"#b8e3ff",width:windowWidth*.8}}  onPress={openPicker} >
+        <Pressable style={{backgroundColor:"#8dc8f2",width:windowWidth*.8}}  onPress={openPicker} >
         <Text  style={{color:"black",fontSize:windowWidth*0.07,fontWeight: 'bold',}} > Select Month</Text></Pressable>
         <Picker
           ref={pickerRef}
-          style={{backgroundColor:"#b8e3ff"}}
+          style={{backgroundColor:"#8dc8f2"}}
           selectedValue={selectedNumber}
           onValueChange={(itemValue, itemIndex) =>
             setSelectedNumber(itemValue)

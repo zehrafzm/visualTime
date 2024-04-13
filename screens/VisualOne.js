@@ -7,8 +7,7 @@ import Circle from "./assets/Circle";
 import empty from "./assets/empty.png";
 import done from "./assets/done.png";
 
-
-export default function Visual (){
+export default function VisualOne (){
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const [data, setData] = useState(null);
     const route = useRoute();
@@ -17,7 +16,10 @@ export default function Visual (){
     const navigation = useNavigation();
     const [totalMinutes,setTotalMinutes]=useState(0)
     const [numColumns, setNumColumns] = useState(5); // Initial number of columns
-
+    const [scrollPositionY, setScrollPositionY] = useState(0);
+    const handleScrollY = (event) => {
+      setScrollPositionY(event.nativeEvent.contentOffset.y);
+    };
 
     const getData = async () => {
         try {
@@ -78,27 +80,26 @@ export default function Visual (){
         };
         navigation.navigate("HomeScreen")
     };
+
     const circleData = Array.from({ length: totalMinutes }).map((_, index) => ({
-      key: String(index),
-      //color: index < totalMinutes-remainingMinutes ? '#1386cf' : 'white',
-      image: index < totalMinutes - remainingMinutes ? done : empty,
-    }));
+        key: String(index),
+        //color: index < totalMinutes-remainingMinutes ? '#1386cf' : 'white',
+        image: index < totalMinutes - remainingMinutes ? done : empty,
+      }));
 
     
     return(
+      
       <View style={{backgroundColor:"#181b52",height:windowHeight, alignItems: "center"}}>
-      <Pressable style={styles.button }  onPress={()=>deleteData(paramName,navigation)}><Text style={styles.buttonText } >delete </Text></Pressable>
+            <Pressable style={[styles.button,{margin:20}] }   onPress={()=>navigation.navigate("HomeScreen")}><Text style={styles.buttonText } >HomeScreen </Text></Pressable>
+            <Pressable style={[styles.button,{margin:20}] }  onPress={()=> navigation.navigate("OneTime")}  >                            
+                                <Text style={styles.buttonText} >set timer</Text>
+                </Pressable>    
            {data ? (
             
                 <View>
-                
-                    <Text style={[styles.Textt,{fontWeight:"bold",fontSize:50,textAlign:"center",
-                    margin:15, borderRadius:25, color:"#95bf97"
-                    }]}>{data.paramName}</Text>
-                    <Text style={{backgroundColor:"#fffceb",fontStyle:"italic",fontSize:25,textAlign:"center"}} > {data.value.descrip}</Text>
-                    <Text style={[styles.Textt,{fontSize:22}]} >total : {JSON.stringify(data.value.value)} min |
-                    remaining : {remainingMinutes} min
-                    </Text>
+                     <Text style={styles.Textt} >total minutes: {JSON.stringify(data.value.value)}</Text>
+                    <Text style={styles.Textt} >remaining time: {remainingMinutes} minutes</Text>
 
                 </View>
             ) : (
@@ -107,12 +108,12 @@ export default function Visual (){
 
   
             <Text style={[styles.Textt,{margin:5,fontSize:20}]} >columns: </Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}   >
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}   >
               <Pressable style={[styles.button,{margin:25,width:90,height:70,justifyContent:"center"}] }  onPress={()=>setNumColumns(5)} ><Text  style={styles.buttonText } >5</Text></Pressable>
               <Pressable style={[styles.button,{margin:25,width:90,height:70,justifyContent:"center"}] }  onPress={()=>setNumColumns(7)} ><Text  style={styles.buttonText } >7</Text></Pressable>
               <Pressable style={[styles.button,{margin:25,width:90,height:70,justifyContent:"center"}] }  onPress={()=>setNumColumns(10)} ><Text  style={styles.buttonText } >10</Text></Pressable>
               </View>
-             
+                    
               <FlatList
                     key={numColumns}
                     data={circleData}
@@ -130,6 +131,16 @@ export default function Visual (){
                     keyExtractor={(item) => item.key}
                     contentContainerStyle={{ alignItems: 'center' }}
                 />
+        {/**
+           <FlatList
+            key={numColumns} 
+            data={circleData}
+            numColumns={numColumns} 
+            renderItem={({ item }) => <Circle color={item.color} size={(windowWidth*0.6)/numColumns} />}
+            keyExtractor={(item) => item.key}
+            contentContainerStyle={{ alignItems: 'center' }} 
+        />
+         */}
         <Text style={{opacity:0}}>ssssssssssssssssssss</Text>
         <Text style={{opacity:0}}>ssssssssssssssssssss</Text>
         </View>

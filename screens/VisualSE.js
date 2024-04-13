@@ -7,16 +7,17 @@ import Circle from "./assets/Circle";
 import empty from "./assets/empty.png";
 import done from "./assets/done.png";
 
-
-export default function Visual (){
+export default function VisualSE (){
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const [data, setData] = useState(null);
     const route = useRoute();
     const { paramName } = route.params;
-    const [remainingMinutes, setRemainingMinutes] = useState(0);
+    const [remainingDays, setRemainingDays] = useState(0);
     const navigation = useNavigation();
-    const [totalMinutes,setTotalMinutes]=useState(0)
+    const [totalDays, setTotalDays]= useState(0);
     const [numColumns, setNumColumns] = useState(5); // Initial number of columns
+
+
 
 
     const getData = async () => {
@@ -39,34 +40,36 @@ export default function Visual (){
     }, []);
       
     useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const jsonValue = await AsyncStorage.getItem(paramName);
-            const storedValue = JSON.parse(jsonValue);
-            setTotalMinutes(storedValue.value);
-            const storedHours = new Date(storedValue.date).getHours();
-            const storedMinutes = new Date(storedValue.date).getMinutes();
-            const currentTime = new Date();
-            const currentHours = currentTime.getHours();
-            const currentMinutes = currentTime.getMinutes();
-            const storedTotalMinutes = storedHours * 60 + storedMinutes;
-            const currentTotalMinutes = currentHours * 60 + currentMinutes;
-            const timeDifference = -storedTotalMinutes + currentTotalMinutes;
-            const remainingTime = storedValue.value - timeDifference;
-            setRemainingMinutes(remainingTime>0 ? remainingTime : 0);
-          } catch (e) {
-            console.error(e);
-          }
-        };
-        const intervalId = setInterval(() => {
-            fetchData();
-          }, 60000); // Update every 60 seconds
-      
+      const fetchData = async () => {
+        try {
+          const jsonValue = await AsyncStorage.getItem(paramName);
+          const storedValue = JSON.parse(jsonValue);
+  
+          const startDate = new Date(storedValue.date).getTime();
+          const endDate = new Date(storedValue.value).getTime();
+          const timeDifference = endDate - startDate;
+  
+          setTotalDays(1+Math.floor(timeDifference / (1000 * 60 * 60 * 24)));
+  
+          const currentDate = new Date().getTime();
+          const timeDifferenceDays =1+ Math.floor((endDate - currentDate) / (1000 * 60 * 60 * 24));
+          setRemainingDays(timeDifferenceDays > 0 ? timeDifferenceDays : 0);
+  
+        } catch (e) {
+          console.error(e);
+        }
+      };
+  
+      const intervalId = setInterval(() => {
         fetchData();
-        return () => {
-            clearInterval(intervalId); 
-          };
-      }, [paramName]);
+      }, 24 * 60 * 60000); // Update every day
+  
+      fetchData();
+      return () => {
+        clearInterval(intervalId);
+      };
+    }, [paramName]);
+  
 
     const deleteData = async (myKey,navigation) => {
         try {
@@ -78,36 +81,44 @@ export default function Visual (){
         };
         navigation.navigate("HomeScreen")
     };
-    const circleData = Array.from({ length: totalMinutes }).map((_, index) => ({
-      key: String(index),
-      //color: index < totalMinutes-remainingMinutes ? '#1386cf' : 'white',
-      image: index < totalMinutes - remainingMinutes ? done : empty,
-    }));
+
+    const circleData = Array.from({ length: totalDays }).map((_, index) => ({
+        key: String(index),
+        image: index < totalDays - remainingDays ? done : empty,      }));
+     
+ 
 
     
     return(
-      <View style={{backgroundColor:"#181b52",height:windowHeight, alignItems: "center"}}>
-      <Pressable style={styles.button }  onPress={()=>deleteData(paramName,navigation)}><Text style={styles.buttonText } >delete </Text></Pressable>
+        <View style={{backgroundColor:"#181b52",height:windowHeight, alignItems: "center"}}>
+        <Pressable style={styles.button }  onPress={()=>deleteData(paramName,navigation)}><Text style={styles.buttonText } >delete </Text></Pressable>
            {data ? (
-            
                 <View>
-                
-                    <Text style={[styles.Textt,{fontWeight:"bold",fontSize:50,textAlign:"center",
-                    margin:15, borderRadius:25, color:"#95bf97"
+                    <Text style={[styles.Textt,{fontWeight:"bold",fontSize:38,textAlign:"center",
+                    margin:10, borderRadius:25                 
                     }]}>{data.paramName}</Text>
+                    
                     <Text style={{backgroundColor:"#fffceb",fontStyle:"italic",fontSize:25,textAlign:"center"}} > {data.value.descrip}</Text>
-                    <Text style={[styles.Textt,{fontSize:22}]} >total : {JSON.stringify(data.value.value)} min |
-                    remaining : {remainingMinutes} min
-                    </Text>
+
+                    <Text style={styles.Textt} >start date: 
+                    {new Date(data.value.date).getDate()}-{new Date(data.value.date).getMonth() + 1}-
+                    {new Date(data.value.date).getFullYear()}
+                  </Text>
+                  <Text style={styles.Textt} >end date: 
+                  {new Date(data.value.value).getDate()}-{new Date(data.value.value).getMonth() + 1}-
+                  {new Date(data.value.value).getFullYear()}
+                </Text>
+                    
+                    <Text style={styles.Textt} >total : {totalDays} days | remaining : {remainingDays} days</Text>
+                    <Text style={styles.Textt} ></Text>
 
                 </View>
             ) : (
                 <Text>No data found for key: {paramName}</Text>
             )}
 
-  
-            <Text style={[styles.Textt,{margin:5,fontSize:20}]} >columns: </Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}   >
+              <Text style={[styles.Textt,{margin:5,fontSize:20}]} >columns: </Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}   >
               <Pressable style={[styles.button,{margin:25,width:90,height:70,justifyContent:"center"}] }  onPress={()=>setNumColumns(5)} ><Text  style={styles.buttonText } >5</Text></Pressable>
               <Pressable style={[styles.button,{margin:25,width:90,height:70,justifyContent:"center"}] }  onPress={()=>setNumColumns(7)} ><Text  style={styles.buttonText } >7</Text></Pressable>
               <Pressable style={[styles.button,{margin:25,width:90,height:70,justifyContent:"center"}] }  onPress={()=>setNumColumns(10)} ><Text  style={styles.buttonText } >10</Text></Pressable>
@@ -130,8 +141,6 @@ export default function Visual (){
                     keyExtractor={(item) => item.key}
                     contentContainerStyle={{ alignItems: 'center' }}
                 />
-        <Text style={{opacity:0}}>ssssssssssssssssssss</Text>
-        <Text style={{opacity:0}}>ssssssssssssssssssss</Text>
         </View>
     )
 }
@@ -169,12 +178,11 @@ const styles = StyleSheet.create({
       fontSize: 18,
       fontWeight: 'bold',
       textAlign: 'center',
-      margin:10
     },
     Textt: {
       color: 'white',
-      fontSize: 28,
-      fontWeight: 'bold',
+      fontSize: 20  ,
+      fontStyle: "italic",
       textAlign: 'center',
     },
     scrollView: {

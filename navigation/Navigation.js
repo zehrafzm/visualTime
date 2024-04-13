@@ -5,6 +5,10 @@ import HomeScreen from '../screens/HomeScreen';
 import CreateTimer from '../screens/CreateTimer';
 import StartEnd from '../screens/StartEnd';
 import Visual from '../screens/Visual';
+import VisualSE from '../screens/VisualSE';
+import OneTime from '../screens/OneTime';
+import VisualOne from '../screens/VisualOne';
+
 
 function Navigation() {
   const Stack = createStackNavigator();
@@ -29,7 +33,11 @@ function Navigation() {
         <Stack.Screen name="CreateTimer" component={CreateTimer} />
         <Stack.Screen name="StartEnd" component={StartEnd} />
         <Stack.Screen name="Visual" component={Visual} />
+        <Stack.Screen name="VisualSE" component={VisualSE} />
+        <Stack.Screen name="OneTime" component={OneTime} />
+        <Stack.Screen name="VisualOne" component={VisualOne} />
       </Stack.Navigator>
+      
     </NavigationContainer>
   );
 }

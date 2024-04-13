@@ -7,22 +7,24 @@ import SelectComponent from "./assets/NumberPicker";
 import MinutesPicker from "./assets/MinutesPicker";
 import HoursPicker from "./assets/HoursPicker";
 
-export default function CreateTimer (){
+export default function CreateTimer ({navigation}){
     const[hours,setHours]=useState("0");
     const[minutes,setMinutes]=useState("0");
     const[timeName,setTimeName]=useState("");
+    const [descrip, setDescrip] = useState("");
+
+    const route = useRoute();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const [data, setData] = useState(null);
-    const navigation = useNavigation();
     const [scrollPositionY, setScrollPositionY] = useState(0);
     const handleScrollY = (event) => {
       setScrollPositionY(event.nativeEvent.contentOffset.y);
     };
 
-    const storeData = async (myKey,value) => {
+    const storeData = async (myKey,value,type,descrip) => {
         try {
             const currentDate = new Date();
-            const data = { date: currentDate, value: value };  
+            const data = { date: currentDate, value: value,type:type, descrip:descrip };  
           const jsonValue = JSON.stringify(data);
           await AsyncStorage.setItem(myKey, jsonValue);
         } catch (e) {
@@ -32,11 +34,11 @@ export default function CreateTimer (){
      
     
      
-    const setTimeObject= (hours,minutes,timeName,navigation)=>{
+    const setTimeObject= (hours,minutes,timeName,descrip,navigation)=>{
         const totalMinutes= parseInt(hours)*60 + parseInt(minutes);
         const myKey = intoKey(timeName);
-        storeData(myKey, totalMinutes);
-        navigation.navigate("HomeScreen")
+        storeData(myKey, totalMinutes,"MIN",descrip);
+        navigation.navigate("Visual", { paramName: intoKey(timeName) })
     } 
     
     
@@ -103,22 +105,29 @@ export default function CreateTimer (){
       scrollEventThrottle={20}
       onScroll={handleScrollY}
     >
-        <View style={{backgroundColor:"#f2e7c9",height:windowHeight, alignItems: "center"}}>
-            <View style={{backgroundColor:"white",marginTop:windowHeight*0.3, alignItems: "center",borderRadius:50
+        <View style={{backgroundColor:"#181b52",height:windowHeight, alignItems: "center"}}>
+            <View style={{backgroundColor:"#8dc8f2",marginTop:windowHeight*0.2, alignItems: "center",borderRadius:50
             }} >
             <TextInput 
                 placeholder="name of the time visualization"
                 value={timeName}
                 onChangeText={(text)=>setTimeName(text)}
-                style={[styles.input,{fontSize:windowWidth*0.03,width:windowWidth*0.7,height:windowHeight*0.1,
-                fontSize:windowHeight*0.02}]}
+                style={[styles.input,{fontSize:windowWidth*0.04,width:windowWidth*0.7,height:windowHeight*0.1,
+               }]}
+            />
+             <TextInput 
+                placeholder="description, motivation words etc."
+                value={descrip}
+                onChangeText={(text)=>setDescrip(text)}
+                style={[styles.input,{fontSize:windowWidth*0.04,width:windowWidth*0.7,height:windowHeight*0.1,
+             }]}
             />
             <HoursPicker   onSelect={handleSelectH} />
             
             <MinutesPicker onSelect={handleSelectM} />
 
 
-            <Pressable onPress={()=>setTimeObject(hours,minutes,timeName,navigation)}  >
+            <Pressable onPress={()=>setTimeObject(hours,minutes,timeName,descrip,navigation)}  >
                 <Text style={{fontSize:windowHeight*0.05}} > Create </Text>
             </Pressable>
             </View>
@@ -151,7 +160,7 @@ const styles = StyleSheet.create({
     },
     button: {
       marginTop: 5,
-      backgroundColor: 'green',
+      backgroundColor: '#bd8700',
       padding: 5,
       borderRadius: 5,
     },

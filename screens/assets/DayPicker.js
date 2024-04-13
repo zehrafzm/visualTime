@@ -4,7 +4,7 @@ import {Picker} from '@react-native-picker/picker';
 
 
 const DayPicker = ({ onSelect }) => {
-    const [selectedNumber, setSelectedNumber] = useState("0");
+    const [selectedNumber, setSelectedNumber] = useState("1");
     const pickerRef = useRef();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 
@@ -23,16 +23,15 @@ const DayPicker = ({ onSelect }) => {
   
     return (
       <View>
-        <Pressable style={{backgroundColor:"#b8e3ff",width:windowWidth*.8}}  onPress={openPicker} >
+        <Pressable style={{backgroundColor:"#b6d8f0",width:windowWidth*.8}}  onPress={openPicker} >
         <Text  style={{color:"black",fontSize:windowWidth*0.07,fontWeight: 'bold',}} > Select Day</Text></Pressable>
         <Picker
           ref={pickerRef}
-          style={{backgroundColor:"#b8e3ff"}}
+          style={{backgroundColor:"#b6d8f0"}}
           selectedValue={selectedNumber}
           onValueChange={(itemValue, itemIndex) =>
             setSelectedNumber(itemValue)
           }>
-          <Picker.Item label="0" value="0" />
           <Picker.Item label="1" value="1" />
           <Picker.Item label="2" value="2" />
           <Picker.Item label="3" value="3" />
